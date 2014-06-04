@@ -1,0 +1,23 @@
+﻿@model IdProvider.Controllers.SAMLResponseViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <h1>Id Provider</h1>
+        <form method="post" action="http://localhost:15881/">
+            <textarea name="SAMLResponse" cols="100" rows="10">@Model.SAMLResponse</textarea><br />
+            <input type="text" name="RelayState" value="@Model.RelayState" /><br />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</body>
+</html>

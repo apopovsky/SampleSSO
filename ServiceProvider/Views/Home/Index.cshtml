@@ -1,0 +1,30 @@
+﻿@model ServiceProvider.Controllers.SamlRequestViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <h1>Service Provider</h1>
+        @if (Model != null)
+        {
+            <form method="post" action="http://localhost:35513/">
+                <textarea name="SAMLRequest" cols="100" rows="10">@Model.SAMLRequest</textarea><br/>
+                <input type="text" name="RelayState" value="@Model.RelayState" /><br />
+                <input type="submit" value="Submit" />
+            </form>
+        }
+        else
+        {
+            @ViewBag.Message
+        }
+    </div>
+</body>
+</html>
