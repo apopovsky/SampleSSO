@@ -1,10 +1,21 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Mvc;
+using System.Xml;
 using SAML2;
 using SAML2.Schema.Core;
 using SAML2.Schema.Protocol;
 using SAML2.Schema.XmlDSig;
 using SAML2.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Xml;
+using System.Security.Cryptography.Xml;
+using Signature = SAML2.Schema.XmlDSig.Signature;
+using SignedInfo = SAML2.Schema.XmlDSig.SignedInfo;
+using Reference = System.Security.Cryptography.Xml.Reference;
 
 namespace IdProvider.Controllers
 {
@@ -40,7 +51,7 @@ namespace IdProvider.Controllers
                     },
                     Reference = new[]
                     {
-                        new Reference
+                        new SAML2.Schema.XmlDSig.Reference
                         {
                             DigestMethod = new DigestMethod
                             {
@@ -69,6 +80,26 @@ namespace IdProvider.Controllers
             return View(model);
         }
 
+        public static void AppendSignatureToXMLDocument(ref XmlDocument XMLSerializedSAMLResponse, String ReferenceURI, X509Certificate2 SigningCert)
+        {
+            var signedXML = new SignedXml(XMLSerializedSAMLResponse);
+
+            signedXML.SigningKey = SigningCert.PrivateKey;
+            signedXML.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
+
+            var reference = new Reference();
+            reference.Uri = "#" + ReferenceURI;
+            reference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
+            reference.AddTransform(new XmlDsigExcC14NTransform());
+            signedXML.AddReference(reference);
+            signedXML.ComputeSignature();
+
+            var signature = signedXML.GetXml();
+
+            var xeResponse = XMLSerializedSAMLResponse.DocumentElement;
+
+            xeResponse.AppendChild(signature);
+        }
     }
 
     public class SAMLResponseViewModel

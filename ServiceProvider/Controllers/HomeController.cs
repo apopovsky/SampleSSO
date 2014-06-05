@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Security;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
-using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using SAML2;
-using SAML2.Protocol;
-using SAML2.Schema.Core;
 using SAML2.Schema.Protocol;
-using SAML2.Utils;
-using KeyInfo = SAML2.Schema.XmlDSig.KeyInfo;
-using Reference = SAML2.Schema.XmlDSig.Reference;
 
 namespace ServiceProvider.Controllers
 {
@@ -33,7 +22,7 @@ namespace ServiceProvider.Controllers
         {
             var request = new Saml20AuthnRequest();
             request.Id = "request_1";
-            request.Request.Version = "1.0";
+            request.Request.Version = "2.0";
             var nameIdPolicy = new NameIdPolicy {Format = Saml20Constants.NameIdentifierFormats.Email};
             request.Request.NameIdPolicy = nameIdPolicy;
             request.Issuer = "http://localhost:15881/";
@@ -54,7 +43,7 @@ namespace ServiceProvider.Controllers
 
         public ActionResult Test()
         {
-            var requestXml = GetRequestXml();
+            XmlDocument requestXml = GetRequestXml();
             var sig = new SignedXml(requestXml);
             var key = new RSACryptoServiceProvider();
 
@@ -62,7 +51,7 @@ namespace ServiceProvider.Controllers
             sig.SigningKey = key;
 
             // Create a reference to be signed.
-            var reference = new System.Security.Cryptography.Xml.Reference {Uri = ""};
+            var reference = new Reference {Uri = ""};
 
             // Add an enveloped transformation to the reference.
             var env = new XmlDsigEnvelopedSignatureTransform();
@@ -71,10 +60,10 @@ namespace ServiceProvider.Controllers
             // Add the reference to the SignedXml object.
             sig.AddReference(reference);
 
-            var path =Path.Combine(new DirectoryInfo(HttpContext.Server.MapPath(@"~\")).Parent.FullName, "sign.crt");
-            var cert = X509Certificate.CreateFromCertFile(path);
+            string path = Path.Combine(new DirectoryInfo(HttpContext.Server.MapPath(@"~\")).Parent.FullName, "sign.crt");
+            X509Certificate cert = X509Certificate.CreateFromCertFile(path);
             // Add an RSAKeyValue KeyInfo (optional; helps recipient find key to validate).
-            var keyInfo = new System.Security.Cryptography.Xml.KeyInfo();
+            var keyInfo = new KeyInfo();
             keyInfo.AddClause(new KeyInfoX509Data(cert));
             sig.KeyInfo = keyInfo;
 
