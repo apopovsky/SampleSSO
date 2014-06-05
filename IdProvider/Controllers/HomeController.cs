@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Web.Mvc;
 using System.Xml;
@@ -34,17 +35,19 @@ namespace IdProvider.Controllers
             {
                 Value = Saml20Constants.StatusCodes.Success
             };
+
             var issuer = new NameId
             {
                 Format = Saml20Constants.NameIdentifierFormats.Transient,
                 Value = "http://localhost:35513/"
             };
+
             var signature = new Signature
             {
                 SignedInfo = new SignedInfo
                 {
                     CanonicalizationMethod =
-                        new CanonicalizationMethod {Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#"},
+                        new CanonicalizationMethod { Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#" },
                     SignatureMethod = new SignatureMethod
                     {
                         Algorithm = "http: //www.w3.org/2000/09/xmldsig#rsa-sha1"
@@ -62,21 +65,32 @@ namespace IdProvider.Controllers
                     }
                 }
             };
+
             var assertion = new Assertion
             {
                 Id = "ass_1",
                 IssueInstant = DateTime.UtcNow,
                 Version = "1.0",
                 Issuer = issuer,
-                Signature = signature
+                Signature = signature,
+                Subject = new Subject
+                {
+                    Items =
+                        new object[] { new NameId { Format = Saml20Constants.NameIdentifierFormats.Email, Value = "pepe@gmail.com" } }
+                }
             };
-            response.Items = new object[] {assertion};
+            response.Items = new object[] { assertion };
             response.InResponseTo = "message_1";
 
-            var nameId = new NameId {Value = "123"};
+            var nameId = new NameId { Value = "123" };
             response.Issuer = nameId;
 
-            var model = new SAMLResponseViewModel { SAMLResponse = Serialization.SerializeToXmlString(response), RelayState = relayState };
+            var path = Path.Combine(new DirectoryInfo(HttpContext.Server.MapPath(@"~\")).Parent.FullName, "sign.crt");
+            var cert = new X509Certificate2(path);
+
+            var r = Serialization.Serialize(response);
+            r.AppendSignatureToXMLDocument("ass_1", cert);
+            var model = new SAMLResponseViewModel { SAMLResponse = r.OuterXml, RelayState = relayState };
             return View(model);
         }
 
