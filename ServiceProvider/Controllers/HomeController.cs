@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
+using System.Xml.Linq;
 using ServiceProvider.Controllers.Saml;
 
 namespace ServiceProvider.Controllers
@@ -28,13 +29,16 @@ namespace ServiceProvider.Controllers
             return requestXml;
         }
 
+
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult Index(Response samlResponse, string relayState)
+        public ActionResult Index(string SAMLResponse, string relayState)
         {
-            if (samlResponse.IsValid())
+            var sResponse = new Response();
+            sResponse.LoadXml(SAMLResponse);
+            if (sResponse.IsValid())
             {
-                ViewBag.Message = "Bienvenido " + samlResponse.GetNameID();
+                ViewBag.Message = "Bienvenido " + sResponse.GetNameID();
             }
             else
             {
