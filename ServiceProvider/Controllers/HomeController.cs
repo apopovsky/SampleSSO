@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
-using System.Xml.Linq;
 using ServiceProvider.Controllers.Saml;
 
 namespace ServiceProvider.Controllers
@@ -96,9 +94,7 @@ namespace ServiceProvider.Controllers
 
             public void LoadXml(string xml)
             {
-                xmlDoc = new XmlDocument();
-                xmlDoc.PreserveWhitespace = true;
-                xmlDoc.XmlResolver = null;
+                xmlDoc = new XmlDocument {PreserveWhitespace = true, XmlResolver = null};
                 xmlDoc.LoadXml(xml);
             }
 
@@ -164,8 +160,7 @@ namespace ServiceProvider.Controllers
             {
                 using (var sw = new StringWriter())
                 {
-                    var xws = new XmlWriterSettings();
-                    xws.OmitXmlDeclaration = true;
+                    var xws = new XmlWriterSettings {OmitXmlDeclaration = true};
 
                     using (var xw = XmlWriter.Create(sw, xws))
                     {

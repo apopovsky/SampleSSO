@@ -1,22 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Web.Mvc;
 using System.Xml;
 using SAML2;
 using SAML2.Schema.Core;
 using SAML2.Schema.Protocol;
-using SAML2.Schema.XmlDSig;
 using SAML2.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Xml;
 using System.Security.Cryptography.Xml;
-using Signature = SAML2.Schema.XmlDSig.Signature;
-using SignedInfo = SAML2.Schema.XmlDSig.SignedInfo;
 using Reference = System.Security.Cryptography.Xml.Reference;
 
 namespace IdProvider.Controllers
@@ -77,8 +68,7 @@ namespace IdProvider.Controllers
             signedXML.SigningKey = SigningCert.PrivateKey;
             signedXML.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
 
-            var reference = new Reference();
-            reference.Uri = "#" + ReferenceURI;
+            var reference = new Reference {Uri = "#" + ReferenceURI};
             reference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
             reference.AddTransform(new XmlDsigExcC14NTransform());
             signedXML.AddReference(reference);
