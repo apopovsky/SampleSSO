@@ -43,37 +43,12 @@ namespace IdProvider.Controllers
                 Value = "http://localhost:35513/"
             };
 
-            var signature = new Signature
-            {
-                SignedInfo = new SignedInfo
-                {
-                    CanonicalizationMethod =
-                        new CanonicalizationMethod { Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#" },
-                    SignatureMethod = new SignatureMethod
-                    {
-                        Algorithm = "http: //www.w3.org/2000/09/xmldsig#rsa-sha1"
-                    },
-                    Reference = new[]
-                    {
-                        new SAML2.Schema.XmlDSig.Reference
-                        {
-                            DigestMethod = new DigestMethod
-                            {
-                                Algorithm = "http://www.w3.org/2000/09/xmldsig#sha1"
-                            },
-                            //Transforms = new []{new Transform{Algorithm = }}
-                        }
-                    }
-                }
-            };
-
             var assertion = new Assertion
             {
                 Id = "ass_1",
                 IssueInstant = DateTime.UtcNow,
                 Version = "1.0",
                 Issuer = issuer,
-                Signature = signature,
                 Subject = new Subject
                 {
                     Items =

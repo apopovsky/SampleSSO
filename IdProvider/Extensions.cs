@@ -41,9 +41,10 @@ namespace IdProvider
             sig.ComputeSignature();
 
             var signature = sig.GetXml();
-            var manager = new XmlNamespaceManager(xmlDoc.NameTable);
-            manager.AddNamespace("saml", SignedXml.XmlDsigNamespaceUrl);
-            var xmlResponse = xmlDoc.SelectSingleNode("saml:Assertion", manager);
+            //var manager = new XmlNamespaceManager(xmlDoc.NameTable);
+            //manager.AddNamespace("saml", SignedXml.XmlDsigNamespaceUrl);
+            //var xmlResponse = xmlDoc.SelectSingleNode("saml:Assertion", manager);
+            var xmlResponse = xmlDoc.DocumentElement;
             xmlResponse.AppendChild(signature);
         }
     }
