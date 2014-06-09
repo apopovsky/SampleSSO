@@ -59,27 +59,7 @@ namespace IdProvider.Controllers
             r.AppendSignatureToXMLDocument("ass_1", cert);
             var model = new SAMLResponseViewModel { SAMLResponse = r.OuterXml, RelayState = relayState };
             return View(model);
-        }
-
-        public static void AppendSignatureToXMLDocument(ref XmlDocument XMLSerializedSAMLResponse, String ReferenceURI, X509Certificate2 SigningCert)
-        {
-            var signedXML = new SignedXml(XMLSerializedSAMLResponse);
-
-            signedXML.SigningKey = SigningCert.PrivateKey;
-            signedXML.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
-
-            var reference = new Reference {Uri = "#" + ReferenceURI};
-            reference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
-            reference.AddTransform(new XmlDsigExcC14NTransform());
-            signedXML.AddReference(reference);
-            signedXML.ComputeSignature();
-
-            var signature = signedXML.GetXml();
-
-            var xeResponse = XMLSerializedSAMLResponse.DocumentElement;
-
-            xeResponse.AppendChild(signature);
-        }
+        }       
     }
 
     public class SAMLResponseViewModel

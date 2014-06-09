@@ -115,7 +115,7 @@ namespace ServiceProvider.Controllers
                 var signedXml = new SignedXml(xmlDoc);
                 foreach (XmlNode node in nodeList)
                 {
-                    signedXml.LoadXml((XmlElement)node);
+                   // signedXml.LoadXml((XmlElement)node);
                     var path = Path.Combine(new DirectoryInfo(HttpContext.Current.Server.MapPath(@"~\")).Parent.FullName, "sign.crt");
                     var cert = new X509Certificate2(path);
 
